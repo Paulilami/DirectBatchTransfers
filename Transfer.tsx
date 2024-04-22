@@ -1,70 +1,59 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { connectToContract } from './contractSlice';
-import { Button, FormControl, FormLabel, Input, Select, VStack } from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { useAccount } from 'wagmi';
+import { useContractWrite } from 'wagmi';
+import { IERC721__factory, IERC1155__factory } from 'wagmi-ui/contracts';
+import { ethers } from 'ethers';
+import { useRouter } from 'next/router';
+import { TokenDropdown, TokenInput, RecipientInput, TransferButton, ConnectWalletButton } from '../components';
 
-const Transfer = () => {
-  const dispatch = useDispatch();
-  const contract = useSelector((state: any) => state.contract.contract);
-  const [tokens, setTokens] = useState([] as string[]);
+interface TransferProps {}
+
+const Transfer: React.FC<TransferProps> = () => {
+  const { address } = useAccount();
+  const router = useRouter();
   const [selectedToken, setSelectedToken] = useState('');
   const [amount, setAmount] = useState('');
   const [recipient, setRecipient] = useState('');
+  const [isTransferring, setIsTransferring] = useState(false);
 
-  useEffect(() => {
-    dispatch(connectToContract('your-contract-address'));
-  }, [dispatch]);
+  const { write: transferERC721 } = useContractWrite({
+    address: selectedToken,
+    abi: IERC721__factory.abi,
+    functionName: 'transferFrom',
+    args: [address as `0x${string}`, recipient, amount],
+  });
 
-  useEffect(() => {
-    if (contract) {
-      // Fetch the list of tokens from the contract
-      // and update the `tokens` state
-    }
-  }, [contract]);
+  const { write: transferERC1155 } = useContractWrite({
+    address: selectedToken,
+    abi: IERC1155__factory.abi,
+    functionName: 'safeTransferFrom',
+    args: [address as `0x${string}`, recipient, amount, ''],
+  });
 
   const handleTransfer = async () => {
-    if (contract && selectedToken && amount && recipient) {
-      // Call the appropriate function on the contract
-      // to transfer the token
+    if (selectedToken && amount && recipient) {
+      setIsTransferring(true);
+
+      if (IERC165(selectedToken).supportsInterface(type(IERC721).interfaceId)) {
+        await transferERC721();
+      } else if (IERC165(selectedToken).supportsInterface(type(IERC1155).interfaceId)) {
+        await transferERC1155();
+      }
+
+      setIsTransferring(false);
+      router.push('/');
     }
   };
 
   return (
-    <VStack spacing={4}>
-      <FormControl>
-        <FormLabel>Token</FormLabel>
-        <Select
-          value={selectedToken}
-          onChange={(e) => setSelectedToken(e.target.value)}
-        >
-          {tokens.map((token) => (
-            <option key={token} value={token}>
-              {token}
-            </option>
-          ))}
-        </Select>
-      </FormControl>
-      <FormControl>
-        <FormLabel>Amount</FormLabel>
-        <Input
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-        />
-      </FormControl>
-      <FormControl>
-        <FormLabel>Recipient</FormLabel>
-        <Input
-          value={recipient}
-          onChange={(e) => setRecipient(e.target.value)}
-        />
-      </FormControl>
-      <Button
-        colorScheme="blue"
-        onClick={handleTransfer}
-      >
-        Transfer
-      </Button>
-    </VStack>
+    <div>
+      <h1>Transfer Tokens</h1>
+      <TokenDropdown onSelect={setSelectedToken} />
+      <TokenInput onChange={setAmount} />
+      <RecipientInput onChange={setRecipient} />
+      <TransferButton onClick={handleTransfer} disabled={isTransferring} />
+      <ConnectWalletButton onClick={() => router.push('/connect-wallet')} />
+    </div>
   );
 };
 
