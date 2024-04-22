@@ -40,4 +40,18 @@ const TokenDropdown: React.FC<TokenDropdownProps> = ({ onSelect }) => {
       });
       setTokens(uniqueTokens);
     }
-  }, [erc20Tokens, erc721Tokens, erc115
+  }, [erc20Tokens, erc721Tokens, erc1155Tokens]);
+
+  return (
+    <select onChange={(e) => onSelect(e.target.value)}>
+      <option value="">Select a token</option>
+      {tokens.map((token) => (
+        <option key={token.address} value={token.address}>
+          {token.symbol} ({token.name})
+        </option>
+      ))}
+    </select>
+  );
+};
+
+export default TokenDropdown;
