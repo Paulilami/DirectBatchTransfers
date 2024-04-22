@@ -4,7 +4,7 @@ import { useContractWrite } from 'wagmi';
 import { IERC721__factory, IERC1155__factory } from 'wagmi-ui/contracts';
 import { ethers } from 'ethers';
 import { useRouter } from 'next/router';
-import { TokenDropdown, TokenInput, RecipientInput, TransferButton, ConnectWalletButton } from '../components';
+import { TokenDropdown, TokenInput, RecipientInput, TransferButton, ConnectWalletButton } from './index';
 
 interface TransferProps {}
 
@@ -14,7 +14,7 @@ const Transfer: React.FC<TransferProps> = () => {
   const [selectedToken, setSelectedToken] = useState('');
   const [amount, setAmount] = useState('');
   const [recipient, setRecipient] = useState('');
-  const [isTransferring, setIsTransferring] = useState(false);
+  const [isTransferring,setIsTransferring] = useState(false);
 
   const { write: transferERC721 } = useContractWrite({
     address: selectedToken,
