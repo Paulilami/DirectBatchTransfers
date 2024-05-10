@@ -1,6 +1,5 @@
 pragma solidity ^0.8.0;
 
-// Import necessary interfaces for each token standard
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import "@openzeppelin/contracts/token/ERC3643/IERC3643.sol";
@@ -10,37 +9,30 @@ import "@openzeppelin/contracts/token/ERC4626/IERC4626.sol";
 
 contract UniversalTokenTransfer {
 
-    // Function to transfer ERC721 tokens
     function transferERC721(address _tokenAddress, uint256 _tokenId, address _recipient) public {
         IERC721(_tokenAddress).transferFrom(msg.sender, _recipient, _tokenId);
     }
 
-    // Function to transfer ERC1155 tokens
     function transferERC1155(address _tokenAddress, uint256 _tokenId, uint256 _amount, address _recipient) public {
         IERC1155(_tokenAddress).safeTransferFrom(msg.sender, _recipient, _tokenId, _amount, "");
     }
 
-    // Function to transfer ERC3643 tokens
     function transferERC3643(address _tokenAddress, uint256 _tokenId, address _recipient) public {
         IERC3643(_tokenAddress).transferFrom(msg.sender, _recipient, _tokenId);
     }
 
-    // Function to transfer ERC4907 tokens
     function transferERC4907(address _tokenAddress, uint256 _tokenId, address _recipient) public {
         IERC4907(_tokenAddress).transferFrom(msg.sender, _recipient, _tokenId);
     }
 
-    // Function to transfer ERC3525 tokens (semi-fungible)
     function transferERC3525(address _tokenAddress, uint256 _tokenId, uint256 _slot, uint256 _amount, address _recipient) public {
         IERC3525(_tokenAddress).transferFrom(msg.sender, _recipient, _tokenId, _slot, _amount);
     }
 
-    // Function to transfer ERC4626 vault tokens (shares)
     function transferERC4626(address _vaultAddress, uint256 _shares, address _recipient) public {
         IERC4626(_vaultAddress).transfer(_recipient, _shares);
     }
 
-    // Function to transfer multiple tokens in a single transaction
     function transferMultipleTokens(
         address[] calldata _tokenAddresses,
         uint256[] calldata _tokenIds,
