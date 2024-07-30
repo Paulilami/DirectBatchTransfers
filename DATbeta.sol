@@ -40,14 +40,14 @@ contract UniversalTokenTransfer {
       }
     }
 
-    // Batch transfers  ERC1155 and ERC721 
+
     if (erc1155Addresses.length > 0) {
       IERC1155(erc1155Addresses[0]).safeBatchTransferFrom(msg.sender, _recipient, erc1155Ids, erc1155Amounts, "");
     }
      if (erc721Addresses.length > 1) {
       IERC721(erc721Addresses[0]).safeBatchTransferFrom(msg.sender, _recipient, erc721Ids, "");
     } else {
-      // Individual ERC721 
+
       for (uint256 i = 0; i < erc721Addresses.length; i++) {
         IERC721(erc721Addresses[i]).transferFrom(msg.sender, _recipient, erc721Ids[i]);
       }
